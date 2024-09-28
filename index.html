@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <!-- Meta setup -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="">
+    <meta name="decription" content="">
+    <meta name="designer" content="">
+    
+    <!-- Title -->
+    <title>Santas Calling</title>
+    
+    <!-- Fav Icon -->
+    <link rel="icon" href="images/favicon.png" />   
+
+    <!-- Main StyleSheet -->
+    <link rel="stylesheet" href="style.css" />  
+
+    <style>
+        /* Add this to ensure the video doesn't exceed its container */
+        .video_item {
+            max-width: 100%;
+            overflow: hidden;
+        }
+        #videoElement {
+            width: 100%;
+            height: auto;
+            max-height: 90vh; /* Limit height to 90% of viewport height */
+        }
+    </style>
+</head>
+<body>
+   
+
+    <!-- main_wrapper start -->
+    <main class="main_wrapper">
+        <div class="video_item">
+            <video id="videoElement" muted playsinline>
+                <source src="videos/video-call.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="wrapper_content">
+            <div class="content_item">
+                <h4>Santa Claus</h4>
+                <p id="timer">Would like to video call</p>
+            </div>
+            <div class="content_btn">
+                <ul id="buttonContainer">
+                    <li><a href="missed-call.html" id="declineButton"><img src="images/reject.svg" alt="Reject Call"></a></li>
+                    <li id="receiveButton"><img src="images/receive.svg" alt="Receive Call"></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Small screen for call timer -->
+        <div id="smallScreen">
+            <span class="call_active"></span>
+        </div>
+    </main>
+    <!-- main_wrapper end -->
+
+    <!-- Ringtone audio -->
+    <audio id="ringtone" loop preload="auto">
+        <source src="audio/ringtone.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        var receiveButton = document.getElementById("receiveButton");
+        var declineButton = document.getElementById("declineButton");
+        var video = document.getElementById("videoElement");
+        var buttonContainer = document.getElementById("buttonContainer");
+        var smallScreen = document.getElementById("smallScreen");
+        var timerDisplay = document.getElementById("timer");
+        var ringtone = document.getElementById("ringtone");
+
+        var seconds = 0;
+        var minutes = 0;
+        var timerInterval;
+
+        // Play ringtone when the page loads
+        window.addEventListener('load', function() {
+            ringtone.play().catch(() => {
+                // Handle playback prevention silently
+            });
+        });
+
+        // Decline button: close the window/tab
+        declineButton.addEventListener("click", function(event) {
+            event.preventDefault();  // Prevent default action
+            try {
+                // Attempt to close the current tab
+                if (window.self === window.top) {
+                    // Check if this is the topmost window
+                    if (window.history.length > 1) {
+                        window.history.back();  // Go back in history if there is a previous page
+                    } else {
+                        window.open('', '_self').close();  // Attempt to close the current tab
+                    }
+                }
+            } catch (e) {
+                // Fallback option if closing fails
+                alert("This tab cannot be closed programmatically. Please close it manually.");
+            }
+            return false;
+        });
+
+        // Receive button: start call timer and show small screen
+        receiveButton.addEventListener("click", function() {
+            // Hide the receive button and center the decline button
+            receiveButton.classList.add("hidden");
+            buttonContainer.classList.add("centered");
+
+            // Stop ringtone
+            ringtone.pause();
+            ringtone.currentTime = 0;
+
+            // Unmute and play the video
+            video.muted = false;
+            video.play().catch(error => {
+                console.error("Error playing video:", error);
+            });
+
+            // Show the small screen for the call
+            smallScreen.style.display = "block";
+
+            // Start the call timer
+            timerInterval = setInterval(function() {
+                seconds++;
+                if (seconds === 60) {
+                    minutes++;
+                    seconds = 0;
+                }
+                timerDisplay.textContent = 
+                    (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                    (seconds < 10 ? "0" + seconds : seconds);
+            }, 1000);
+            return false;
+        });
+
+        // Close the window when the video ends
+        video.addEventListener('ended', function() {
+            try {
+                if (window.self === window.top) {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.open('', '_self').close();
+                    }
+                }
+            } catch (e) {
+                alert("This tab cannot be closed programmatically. Please close it manually.");
+            }
+        });
+
+        // Prevent default fullscreen behavior
+        video.addEventListener('webkitbeginfullscreen', function(e) {
+            e.preventDefault();
+        }, false);
+
+        // Ensure video doesn't go fullscreen on iOS
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+    </script>   
+</body>
+</html>
