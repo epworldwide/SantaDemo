@@ -97,6 +97,7 @@ body {
 
 /*======================== main_wrapper start ==========================*/
 .main_wrapper {
+    
     max-width: 430px;
     width: 100%;
     height: 100vh;
@@ -106,22 +107,12 @@ body {
     overflow: hidden;
 }
 
-/* New styles for fullscreen video */
-.video_item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-}
-
 .video_item video {
     width: 100%;
     height: 100vh;
     object-fit: cover;
     position: relative;
     z-index: 9;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 #videoElement::-webkit-media-controls {
@@ -225,6 +216,15 @@ body {
     z-index: 99999;
 }
 
+/*.call_active {
+    width: 10px;
+    height: 10px;
+    display: block;
+    background: #D22B11;
+    margin-left: auto;
+    border-radius: 50%;
+}
+*/
 /* Hide the receive button and center the decline button */
 .hidden {
     display: none;
