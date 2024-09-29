@@ -76,22 +76,26 @@
         var seconds = 0;
         var minutes = 0;
         var timerInterval;
-        var ringtoneStarted = false;
 
-        // Function to play ringtone
-        function playRingtone(event) {
-            // Check if the click/touch is not on the buttons
-            if (!event.target.closest('#receiveButton') && !event.target.closest('#declineButton') && !ringtoneStarted) {
-                ringtone.play().catch(() => {
-                    // Handle playback prevention silently
-                });
-                ringtoneStarted = true;
-            }
+        // Function to play ringtone automatically
+        function playRingtone() {
+            ringtone.play().catch(error => {
+                console.error("Error playing ringtone:", error);
+                // If auto-play is blocked, we'll need user interaction
+                document.body.addEventListener('touchstart', playRingtoneOnInteraction);
+                document.body.addEventListener('click', playRingtoneOnInteraction);
+            });
         }
 
-        // Add event listeners to body for both touch and click events
-        document.body.addEventListener('touchstart', playRingtone);
-        document.body.addEventListener('click', playRingtone);
+        // Fallback function if autoplay is blocked
+        function playRingtoneOnInteraction() {
+            ringtone.play();
+            document.body.removeEventListener('touchstart', playRingtoneOnInteraction);
+            document.body.removeEventListener('click', playRingtoneOnInteraction);
+        }
+
+        // Play ringtone when the page loads
+        window.addEventListener('load', playRingtone);
 
         // Decline button: navigate to missed-call.html
         declineButton.addEventListener("click", function(event) {
