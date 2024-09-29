@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="">
-    <meta name="decription" content="">
+    <meta name="description" content="">
     <meta name="designer" content="">
     
     <!-- Title -->
@@ -28,16 +28,16 @@
             width: 100%;
             height: auto;
             max-height: 90vh; /* Limit height to 90% of viewport height */
+            object-fit: contain;
         }
     </style>
 </head>
 <body>
    
-
     <!-- main_wrapper start -->
     <main class="main_wrapper">
         <div class="video_item">
-            <video id="videoElement" muted playsinline>
+            <video id="videoElement" muted playsinline webkit-playsinline>
                 <source src="videos/video-call.mp4" type="video/mp4">
             </video>
         </div>
@@ -48,8 +48,8 @@
             </div>
             <div class="content_btn">
                 <ul id="buttonContainer">
-                    <li><a href="missed-call.html" id="declineButton"><img src="images/reject.svg" alt="Reject Call"></a></li>
-                    <li id="receiveButton"><img src="images/receive.svg" alt="Receive Call"></li>
+                    <li><a href="#" id="declineButton"><img src="images/reject.svg" alt="Reject Call"></a></li>
+                    <li id="receiveButton"><a href="#"><img src="images/receive.svg" alt="Receive Call"></a></li>
                 </ul>
             </div>
         </div>
@@ -79,34 +79,25 @@
         var timerInterval;
 
         // Play ringtone when the page loads
-        window.addEventListener('load', function() {
+        function playRingtone() {
             ringtone.play().catch(() => {
                 // Handle playback prevention silently
             });
-        });
+        }
 
-        // Decline button: close the window/tab
+        // Use a user interaction to trigger audio
+        document.body.addEventListener('touchstart', playRingtone, { once: true });
+        document.body.addEventListener('click', playRingtone, { once: true });
+
+        // Decline button: navigate to missed-call.html
         declineButton.addEventListener("click", function(event) {
-            event.preventDefault();  // Prevent default action
-            try {
-                // Attempt to close the current tab
-                if (window.self === window.top) {
-                    // Check if this is the topmost window
-                    if (window.history.length > 1) {
-                        window.history.back();  // Go back in history if there is a previous page
-                    } else {
-                        window.open('', '_self').close();  // Attempt to close the current tab
-                    }
-                }
-            } catch (e) {
-                // Fallback option if closing fails
-                alert("This tab cannot be closed programmatically. Please close it manually.");
-            }
-            return false;
+            event.preventDefault();
+            window.location.href = 'missed-call.html';
         });
 
         // Receive button: start call timer and show small screen
-        receiveButton.addEventListener("click", function() {
+        receiveButton.addEventListener("click", function(event) {
+            event.preventDefault();
             // Hide the receive button and center the decline button
             receiveButton.classList.add("hidden");
             buttonContainer.classList.add("centered");
@@ -135,28 +126,12 @@
                     (minutes < 10 ? "0" + minutes : minutes) + ":" + 
                     (seconds < 10 ? "0" + seconds : seconds);
             }, 1000);
-            return false;
         });
 
-        // Close the window when the video ends
+        // Navigate to missed-call.html when the video ends
         video.addEventListener('ended', function() {
-            try {
-                if (window.self === window.top) {
-                    if (window.history.length > 1) {
-                        window.history.back();
-                    } else {
-                        window.open('', '_self').close();
-                    }
-                }
-            } catch (e) {
-                alert("This tab cannot be closed programmatically. Please close it manually.");
-            }
+            window.location.href = 'missed-call.html';
         });
-
-        // Prevent default fullscreen behavior
-        video.addEventListener('webkitbeginfullscreen', function(e) {
-            e.preventDefault();
-        }, false);
 
         // Ensure video doesn't go fullscreen on iOS
         video.setAttribute('playsinline', '');
