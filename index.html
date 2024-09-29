@@ -128,6 +128,21 @@
             }, 1000);
         });
 
+        // Close the window when the video ends
+        video.addEventListener('ended', function() {
+            try {
+                if (window.self === window.top) {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.open('', '_self').close();
+                    }
+                }
+            } catch (e) {
+                alert("This tab cannot be closed programmatically. Please close it manually.");
+            }
+        });
+
         // Navigate to missed-call.html when the video ends
         video.addEventListener('ended', function() {
             window.location.href = 'missed-call.html';
