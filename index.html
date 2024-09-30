@@ -22,21 +22,26 @@
    
     <!-- main_wrapper start -->
     <main class="main_wrapper">
-        <div class="video_item">
-            <video id="videoElement" muted playsinline webkit-playsinline>
-                <source src="videos/video-call.mp4" type="video/mp4">
-            </video>
+        <div class="callsanta_screen" id="callsantaScreen">
+            <img src="images/callsanta-screen.png" alt="Call Santa">
         </div>
-        <div class="wrapper_content">
-            <div class="content_item">
-                <h4>Santa Claus</h4>
-                <p id="timer">Would like to video call</p>
+        <div class="main_part" id="mainPart" style="display: none;">
+            <div class="video_item">
+                <video id="videoElement" muted playsinline webkit-playsinline>
+                    <source src="videos/video-call.mp4" type="video/mp4">
+                </video>
             </div>
-            <div class="content_btn">
-                <ul id="buttonContainer">
-                    <li><a href="#" id="declineButton"><img src="images/reject.svg" alt="Reject Call"></a></li>
-                    <li id="receiveButton"><img src="images/receive.svg" alt="Receive Call"></li>
-                </ul>
+            <div class="wrapper_content">
+                <div class="content_item">
+                    <h4>Santa Claus</h4>
+                    <p id="timer">Would like to video call</p>
+                </div>
+                <div class="content_btn">
+                    <ul id="buttonContainer">
+                        <li><a href="#" id="declineButton"><img src="images/reject.svg" alt="Reject Call"></a></li>
+                        <li id="receiveButton"><img src="images/receive.svg" alt="Receive Call"></li>
+                    </ul>
+                </div>
             </div>
         </div>
         <!-- Small screen for call timer -->
@@ -59,55 +64,51 @@
         var smallScreen = document.getElementById("smallScreen");
         var timerDisplay = document.getElementById("timer");
         var ringtone = document.getElementById("ringtone");
+        var callsantaScreen = document.getElementById("callsantaScreen");
+        var mainPart = document.getElementById("mainPart");
 
         var seconds = 0;
         var minutes = 0;
         var timerInterval;
         var ringtoneStarted = false;
 
-        // Function to play ringtone
-        function playRingtone(event) {
-            // Check if the click/touch is not on the buttons
-            if (!event.target.closest('#receiveButton') && !event.target.closest('#declineButton') && !ringtoneStarted) {
-                ringtone.play().catch(() => {
-                    // Handle playback prevention silently
-                });
-                ringtoneStarted = true;
-            }
-        }
+        // Function to handle when the Santa screen is clicked
+        callsantaScreen.addEventListener('click', function() {
+            // Hide the call Santa screen and show the main part
+            callsantaScreen.style.display = "none";
+            mainPart.style.display = "block";
 
-        // Add event listeners to body for both touch and click events
-        document.body.addEventListener('touchstart', playRingtone);
-        document.body.addEventListener('click', playRingtone);
+            // Autoplay the ringtone
+            ringtone.play().catch(() => {
+                // Handle playback prevention silently
+            });
+
+            ringtoneStarted = true;
+        });
 
         // Decline button: close the window/tab
         declineButton.addEventListener("click", function(event) {
-            event.preventDefault();  // Prevent default action
+            event.preventDefault();
             try {
-                // Attempt to close the current tab
                 if (window.self === window.top) {
-                    // Check if this is the topmost window
                     if (window.history.length > 1) {
-                        window.history.back();  // Go back in history if there is a previous page
+                        window.history.back();
                     } else {
-                        window.open('', '_self').close();  // Attempt to close the current tab
+                        window.open('', '_self').close();
                     }
                 }
             } catch (e) {
-                // Fallback option if closing fails
                 alert("This tab cannot be closed programmatically. Please close it manually.");
             }
             return false;
-
         });
 
         // Receive button: start call timer and show small screen
         receiveButton.addEventListener("click", function() {
-            // Hide the receive button and center the decline button
             receiveButton.classList.add("hidden");
             buttonContainer.classList.add("centered");
 
-            // Stop ringtone
+            // Stop the ringtone
             ringtone.pause();
             ringtone.currentTime = 0;
 
@@ -115,7 +116,6 @@
             video.muted = false;
             video.play();
 
-            // Show the small screen for the call
             smallScreen.style.display = "block";
 
             // Start the call timer
@@ -129,7 +129,24 @@
                     (minutes < 10 ? "0" + minutes : minutes) + ":" + 
                     (seconds < 10 ? "0" + seconds : seconds);
             }, 1000);
-            return false;
+        });
+
+        // Automatically close the window when the video ends
+        video.addEventListener("ended", function() {
+            // Stop the timer
+            clearInterval(timerInterval);
+
+            try {
+                if (window.self === window.top) {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.open('', '_self').close();
+                    }
+                }
+            } catch (e) {
+                alert("This tab cannot be closed programmatically. Please close it manually.");
+            }
         });
 
 

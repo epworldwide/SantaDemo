@@ -247,3 +247,18 @@ body {
 #receiveButton img {
     cursor: pointer;
 }
+
+.callsanta_screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+.callsanta_screen img {
+    width: 100%;
+    height: 100%;
+}
